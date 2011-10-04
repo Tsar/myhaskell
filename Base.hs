@@ -185,24 +185,33 @@ plus' a b = case a of
 
 -- Другое сложение (ведёт себя иначе, но
 -- результат такой же)
-plus'' Zero b = Zero
+plus'' Zero b     = Zero
 plus'' (Succ a) b = Succ $ plus'' a b
 
 -- Реализуйте:
 -- * умножение (через сложение)
--- mul :: Nat -> Nat -> Nat
--- mul a b = ?
+mul :: Nat -> Nat -> Nat
+mul Zero b     = Zero
+mul (Succ a) b = (a `mul` b) `plus` b
 
 -- * вычитание (без использования предыдущих)
 -- При этом, sub a b | (a - b), если a >= b
 --                   | 0        иначе
 
--- sub :: Nat -> Nat -> Nat
--- sub a b = ?
+sub :: Nat -> Nat -> Nat
+sub Zero b            = Zero
+sub a Zero            = a
+sub (Succ a) (Succ b) = a `sub` b
+
+greater :: Nat -> Nat -> Nat
+greater Zero b = Zero
+greater a Zero = Succ Zero
+greater a b    = (a `sub` b) `greater` Zero
 
 -- * деление (через вычитание, остаток можно выкинуть)
--- div :: Nat -> Nat -> Nat
--- div a b = ?
+div :: Nat -> Nat -> Nat
+div Zero b = Zero
+div a b    = ((a `sub` b) `div` b) `plus` ((Succ a) `greater` b)
 
 -------------------------------------------
 -- Избавляемся от встроенных типов.
@@ -319,8 +328,8 @@ curry :: (Pair a b -> c) -> a -> b -> c
 curry f a b = f (Pair a b)
 
 -- Реализуйте обратную:
--- uncurry :: (a -> b -> c) -> Pair a b -> c
--- uncurry a b = ?
+uncurry :: (a -> b -> c) -> Pair a b -> c
+uncurry f (Pair a b) = f a b
 
 -- Просто какие-то примеры.
 example8 (Pair Zero (Succ _)) = Succ Zero
@@ -330,8 +339,8 @@ example8 (Pair (Succ a) _) = a
 example9 (Pair (Pair a b) c) = Pair a (Pair b c)
 
 -- Реализуйте функцию pmap с типом
--- pmap :: (a -> a') -> (b -> b') -> Pair a b -> Pair a' b'
--- pmap f g p = ?
+pmap :: (a -> a') -> (b -> b') -> Pair a b -> Pair a' b'
+pmap f g (Pair a b) = Pair (f a) (g b)
 -- делающую что-то разумное.
 
 -------------------------------------------
@@ -348,8 +357,9 @@ length Nil = 0
 length (Cons _ b) = 1 + length b
 
 -- Реализуйте функцию map с типом
--- map :: (a -> b) -> List a -> List b
--- map f l = ?
+map :: (a -> b) -> List a -> List b
+map f Nil        = Nil
+map f (Cons a l) = Cons (f a) (map f l)
 -- делающую что-то разумное и такую, что length l == length (map f l)
 
 data Tree a = Node a (Tree a) (Tree a) -- Узел
@@ -362,13 +372,15 @@ height Leaf = 0
 height (Node _ a b) = 1 + max (height a) (height b)
 
 -- Реализуйте функцию
--- tmap :: (a -> b) -> Tree a -> Tree b
--- tmap f t = ?
+tmap :: (a -> b) -> Tree a -> Tree b
+tmap f Leaf         = Leaf
+tmap f (Node x y z) = Node (f x) (tmap f y) (tmap f z)
 -- делающую что-то разумное и такую, что height t == height (tmap f t)
 
 -- Реализуйте функцию
--- list2tree :: List a -> Tree a
--- list2tree l = ?
+list2tree :: List a -> Tree a
+list2tree Nil        = Leaf
+list2tree (Cons a l) = Node a (list2tree l) Leaf
 -- делающую что-то разумное и такую, что length l == height (list2tree l)
 
 -------------------------------------------
@@ -380,45 +392,61 @@ data Maybe a = Just a
     deriving Show
 
 -- Реализуйте функцию
--- find :: (a -> Bool) -> List a -> Maybe a
--- find p t = ?
+find :: (a -> Bool) -> List a -> Maybe a
+find p Nil = Nothing
+find p (Cons a l) = if (p a) == True
+    then Just a
+    else find p l
 -- которая ищет в списке t элемент, удовлетворяющий предикату p (если такой есть).
 
 -- Реализуйте функцию
--- filter :: (a -> Bool) -> List a -> List a
--- filter p t = ?
+filter :: (a -> Bool) -> List a -> List a
+filter p Nil = Nil
+filter p (Cons a l) = if (p a) == True
+    then (Cons a (filter p l))
+    else filter p l
 -- которая генерирует список из элементов t, удовлетворяющих предикату f.
 
 isJust Nothing  = False
 isJust (Just _) = True
 
 -- При помощи filter, isJust и map реализуйте разумную функцию с типом
--- maybefilter :: List (Maybe a) -> List a
--- maybefilter l = ?
+fromjust :: Maybe a -> a
+fromjust (Just a) = a
+
+maybefilter :: List (Maybe a) -> List a
+maybefilter l = map fromjust (filter isJust l)
 --
 -- подсказка:
 -- map (\(Just a) -> a)
 -- Что в этой функции (и подсказке) плохо?
+-- Волков И.Р.: Если записать, как я написал fromjust, то вроде бы всё хорошо...
 
 -- Реализуйте разумную функцию
--- gfilter :: (a -> Maybe b) -> List a -> List b
--- gfilter f l = ?
+gfilter :: (a -> Maybe b) -> List a -> List b
+gfilter f l = maybefilter (map f l)
 
 -- При помощи неё реализуйте maybefilter':
 -- maybefilter' :: List (Maybe a) -> List a
 -- maybefilter' l = ?
 -- не обладающую предыдущим недостатком.
+-- Волков И.Р.: Не вижу там недостатка. И к тому же у меня gfilter сделан через maybefilter.
 
 data Either a b = Left a
                 | Right b
     deriving Show
 
-data Empty --Пустое множество
+-- Пустое множество
+data Empty = Empty
 
 -- Реализуйте
--- maybe2either :: Maybe a -> Either Empty a
--- maybe2either m = ?
+maybe2either :: Maybe a -> Either Empty a
+maybe2either Nothing = Left Empty
+maybe2either (Just a) = Right a
+-- Волков И.Р.: Я вообще не понял, какая семантика предполагается у этой функции (но может хоть угадал?)
 
 -- Реализуйте
--- emap :: (a -> a') -> (b -> b') -> Either a b -> Either a' b'
--- emap f g e = ?
+emap :: (a -> a') -> (b -> b') -> Either a b -> Either a' b'
+emap f g (Left x) = Left $ f x
+emap f g (Right x) = Right $ g x
+-- Волков И.Р.: Тут тоже пишу наугад
