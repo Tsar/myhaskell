@@ -221,20 +221,53 @@ div a b    = ((a `sub` b) `div` b) `plus` ((Succ a) `greater` b)
 -- тем свойством, что каждое целое число имеет в нём
 -- уникальное представление.
 
--- data Integer = ?
+data Nat' = One | Next Nat'
+instance Show Nat' where show = show . toIntN
+
+toIntN :: Nat' -> Int
+toIntN One      = 1
+toIntN (Next a) = 1 + toIntN a
+
+fromIntN :: Int -> Nat'
+fromIntN 1 = One
+fromIntN a = Next (fromIntN (a - 1))
+
+plusN One b     = Next b
+plusN (Next a) b = plusN a (Next b)
+
+data Integer = Zer | Pos Nat' | Neg Nat'
+instance Show Integer where show = show . toIntI
+
+toIntI :: Integer -> Int
+toIntI Zer     = 0
+toIntI (Pos a) = toIntN a
+toIntI (Neg a) = -(toIntN a)
+
+fromIntI :: Int -> Integer
+fromIntI a | a == 0 = Zer
+           | a > 0  = Pos (fromIntN a)
+           | a < 0  = Neg (fromIntN (-a))
 
 -- Реализуйте:
 -- * сложение
--- zplus :: Integer -> Integer -> Integer
--- zplus a b = ?
+zplus :: Integer -> Integer -> Integer
+zplus Zer b = b
+zplus (Pos a) (Pos b) = Pos (plusN a b)
+zplus (Neg a) (Neg b) = Neg (plusN a b)
+zplus (Pos One) (Neg One) = Zer
+zplus (Pos One) (Neg (Next b)) = Neg b
+zplus (Pos (Next a)) (Neg b) = zplus (zplus (Pos a) (Neg b)) (Pos One)
+zplus a b = zplus b a
 
 -- * умножение
 -- zmul :: Integer -> Integer -> Integer
 -- zmul a b = ?
 
 -- * вычитание
--- zsub :: Integer -> Integer -> Integer
--- zsub a b = ?
+zsub :: Integer -> Integer -> Integer
+zsub a (Pos b) = zplus a (Neg b)
+zsub a (Neg b) = zplus a (Pos b)
+zsub a Zer = a
 
 -- * деление
 -- zdiv :: Integer -> Integer -> Integer
@@ -247,7 +280,8 @@ div a b    = ((a `sub` b) `div` b) `plus` ((Succ a) `greater` b)
 -- Придумайте тип для рациональных чисел.
 -- Уникальность представления каждого числа не обязательна.
 
--- data Rational = ?
+-- Волков И.Р.: Рациональные представлю как p/q, где p принадлежит Z, q принадлежит N
+data Rational = Integer Nat'
 
 -- Реализуйте:
 -- * сложение
