@@ -297,25 +297,28 @@ zdiv a b = if (zgreaterthanzeroorequal (zsub a b) == True)
 -- Придумайте тип для рациональных чисел.
 -- Уникальность представления каждого числа не обязательна.
 
--- Волков И.Р.: Рациональные представлю как p/q, где p принадлежит Z, q принадлежит N
-data Rational = Integer Nat'
+-- Волков И.Р.: Рациональные представлю как p/q, где p и q принадлежат Z
+data Rational = Constr Integer Integer
+    deriving Show
 
 -- Реализуйте:
 -- * сложение
--- rplus :: Rational -> Rational -> Rational
--- rplus a b = ?
+rplus :: Rational -> Rational -> Rational
+rplus (Constr a b) (Constr c d) = Constr (zplus (zmul a d) (zmul b c)) (zmul b d)
 
 -- * умножение
--- rmul :: Rational -> Rational -> Rational
--- rmul a b = ?
+rmul :: Rational -> Rational -> Rational
+rmul (Constr a b) (Constr c d) = Constr (zmul a c) (zmul b d)
 
 -- * вычитание
--- rsub :: Rational -> Rational -> Rational
--- rsub a b = ?
+rsub :: Rational -> Rational -> Rational
+rsub (Constr a b) (Constr c d) = Constr (zsub (zmul a d) (zmul b c)) (zmul b d)
 
 -- * деление
--- rdiv :: Rational -> Rational -> Rational
--- rdiv a b = ?
+rdiv :: Rational -> Rational -> Rational
+rdiv (Constr a b) (Constr c d) = Constr (zmul a d) (zmul b c)
+
+-- Волков И.Р.: Теперь можно делать так: rplus (Constr (fromIntI 1) (fromIntI 2)) (Constr (fromIntI 1) (fromIntI 3)) и т.д.
 
 -------------------------------------------
 -- Конструируем типы.
