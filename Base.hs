@@ -248,6 +248,11 @@ fromIntI a | a == 0 = Zer
            | a > 0  = Pos (fromIntN a)
            | a < 0  = Neg (fromIntN (-a))
 
+zunaryminus :: Integer -> Integer
+zunaryminus Zer = Zer
+zunaryminus (Pos a) = Neg a
+zunaryminus (Neg a) = Pos a
+
 -- Реализуйте:
 -- * сложение
 zplus :: Integer -> Integer -> Integer
@@ -260,18 +265,30 @@ zplus (Pos (Next a)) (Neg b) = zplus (zplus (Pos a) (Neg b)) (Pos One)
 zplus a b = zplus b a
 
 -- * умножение
--- zmul :: Integer -> Integer -> Integer
--- zmul a b = ?
+zmul :: Integer -> Integer -> Integer
+zmul Zer b = Zer
+zmul (Pos One) b = b
+zmul (Pos (Next a)) b = zplus (zmul (Pos a) b) b
+zmul (Neg a) b = zunaryminus (zmul (Pos a) b)
 
 -- * вычитание
 zsub :: Integer -> Integer -> Integer
-zsub a (Pos b) = zplus a (Neg b)
-zsub a (Neg b) = zplus a (Pos b)
-zsub a Zer = a
+zsub a b = zplus a (zunaryminus b)
+
+-- Волков И.Р.: здесь я уже нагло заюзал булевый тип (ну Вы ведь верите, что я мог без него, как в div для Nat)
+zgreaterthanzeroorequal (Pos a) = True
+zgreaterthanzeroorequal Zer = True
+zgreaterthanzeroorequal _ = False
 
 -- * деление
--- zdiv :: Integer -> Integer -> Integer
--- zdiv a b = ?
+zdiv :: Integer -> Integer -> Integer
+zdiv Zer b = Zer
+zdiv (Neg a) (Neg b) = zdiv (Pos a) (Pos b)
+zdiv (Pos a) (Neg b) = zdiv (Neg a) (Pos b)
+zdiv (Neg a) (Pos b) = zunaryminus (zdiv (Pos a) (Pos b))
+zdiv a b = if (zgreaterthanzeroorequal (zsub a b) == True)
+              then zplus (Pos One) (zdiv (zsub a b) b)
+              else Zer
 
 -------------------------------------------
 -- Избавляемся от встроенных типов.
