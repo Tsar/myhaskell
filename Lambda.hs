@@ -60,7 +60,7 @@ normal' term = case term of
 applicative' :: Term -> Term
 applicative' term = case term of
     Var v            -> term
-    App (Abs v t) t' -> betaRecuct v (applicative' t') (applicative' t)
+    App (Abs v t) t' -> applicative' (betaRecuct v (applicative' t') (applicative' t))
     Abs v t          -> term
     App t t'         -> App (applicative' t) (applicative' t')
 
