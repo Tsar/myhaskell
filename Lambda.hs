@@ -49,20 +49,20 @@ betaRecuct var what term = case term of
     App t t' -> App (betaRecuct var what t) (betaRecuct var what t')
 
 -- Нормализация нормальным порядком терма term
--- normal' :: Term -> Term
--- normal' term = ?
-
--- Эти строчки после реализации стереть
 normal' :: Term -> Term
-normal' = undefined
+normal' term = case term of
+    Var v            -> term
+    App (Abs v t) t' -> normal' (betaRecuct v t' t)
+    Abs v t          -> Abs v (normal' t)
+    App t t'         -> App (normal' t) (normal' t')
 
 -- Нормализация аппликативным порядком терма term
--- applicative' :: Term -> Term
--- applicative' term = ?
-
--- Эти строчки после реализации стереть
-applicative' :: Term -> Term 
-applicative' = undefined
+applicative' :: Term -> Term
+applicative' term = case term of
+    Var v            -> term
+    App (Abs v t) t' -> betaRecuct v (applicative' t') (applicative' t)
+    Abs v t          -> term
+    App t t'         -> App (applicative' t) (applicative' t')
 
 -- Маркер конца ресурсов
 data TooLoong = TooLoong deriving Show
