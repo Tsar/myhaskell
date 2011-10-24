@@ -45,7 +45,7 @@ newname fv v = head . filter (\x -> not . elem x $ fv) . iterate ('_':) $ v
 betaRecuct :: Varible -> Term -> Term -> Term
 betaRecuct var what term = case term of
     Var v    -> if v == var then what else term
-    Abs v t  -> if v == var then term else Abs (newname ((free what) ++ (free t)) v) (betaRecuct var what t)
+    Abs v t  -> if v == var then term else Abs v (betaRecuct var (subst v (Var (newname (free what) v)) what) t)
     App t t' -> App (betaRecuct var what t) (betaRecuct var what t')
 
 -- Нормализация нормальным порядком терма term
