@@ -71,11 +71,22 @@ data TooLoong = TooLoong deriving Show
 -- Результат: Или числа итераций недостаточно, чтобы достичь нормальной
 -- формы. Или (число нерастраченных итераций, терм в нормальной форме).
 -- 
--- normal :: Int -> Term -> Either TooLoong (Int, Term)
--- normal n term = ?
-
--- Эту строчку после реализации стереть
-normal _ = normal'
+normal :: Int -> Term -> Either TooLoong (Int, Term)
+normal n term = if n == 0 then Left TooLoong else
+    case term of
+        Var v            -> Right (n, term)
+        App (Abs v t) t' -> normal (n - 1) (betaRecuct v t' t)
+        Abs v t          -> let subRes = normal (n - 1) t in
+                                case subRes of
+                                    Left TooLoong  -> Left TooLoong
+                                    Right (n', t') -> Right (n', (Abs v t'))
+        App t t'         -> let subRes1 = normal (n - 1) t in
+                                case subRes1 of
+                                     Left TooLoong     -> Left TooLoong
+                                     Right (n', tRes1) -> let subRes2 = normal (n' - 1) t' in
+                                                              case subRes2 of
+                                                                   Left TooLoong      -> Left TooLoong
+                                                                   Right (n'', tRes2) -> Right (n'', (App tRes1 tRes2))
 
 -- (*) Аналогичная нормализация аппликативным порядком.
 -- applicative :: Int -> Term -> Either TooLoong (Int, Term)
