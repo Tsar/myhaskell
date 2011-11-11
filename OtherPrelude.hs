@@ -66,7 +66,7 @@ break p (a:as) = if (p a) then ((a:subgood), subbad) else ([], a:as) where (subg
 -- Список задом на перёд
 reverse :: [a] -> [a]
 reverse []     = []
-reverse (a:as) = (reverse as):a  -- TODO: Сделать чтоб компилилось
+reverse (a:as) = (reverse as) ++ (a:[])
 
 -- Добавить элемент ко всем спискам в списке (вспомогательная функция)
 appendElementToAllLists :: a -> [[a]] -> [[a]]
