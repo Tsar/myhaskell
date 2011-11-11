@@ -177,13 +177,15 @@ data MulRational = RMult Rational
 
 -- Реализуйте инстансы Monoid для Rational и MulRational
 instance Monoid Rational where
-    ?
+    mzero = 0
+    mappend = (+)
 
 instance Monoid MulRational where
-    ?
+    mzero = RMutl 1
+    (RMult a) `mappend` (RMult b) = RMult $ a * b
 
-instange Monoid MulInteger where
-    mzero = 1
+instance Monoid MulInteger where
+    mzero = Mult 1
     (Mult a) `mappend` (Mult b) = Mult $ a * b
 
 -- Фолдабл
