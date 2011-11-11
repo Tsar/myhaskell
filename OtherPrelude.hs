@@ -240,7 +240,7 @@ mtfold (MNode a l r) = a `mappend` (mtfold l) `mappend` (mtfold r)
 -- констреинтах Monoid a быть не должно.
 -- Для широты фантазии в терме можно использовать классы типов, определённые в любом
 -- месте этого файла.
-mterm = ?
+--mterm = ?
 
 -- (**) Разберитесь чем отличаются эти определения.
 -- "Скомпилируйте" их в наш гипотетический язык программирования с
@@ -322,15 +322,41 @@ anticoncat n l  = (take n l):(anticoncat n (drop n l))
 matsum :: Matrix a -> Matrix a -> Matrix a
 matsum (Matrix x) (Matrix y) = Matrix (anticoncat (lengthOfList x) (zipWith mappend (concat x) (concat y)))
 
-matscalarmul = ?
+matscalarmul :: Matrix a -> Matrix a -> Matrix a
+matscalarmul (Matrix x) (Matrix y) = Matrix (anticoncat (lengthOfList x) (zipWith rmul (concat x) (concat y)))
 
-matmul = ?
+getRow :: Integer -> Matrix a -> [a]
+getRow n (Matrix a) = a !! n
+
+getColumn :: Integer -> Matrix a -> [a]
+getColumn n (Matrix a) = map (!! n) a
+
+sumList :: Ring a => [a] -> a
+sumList []     = mzero
+sumList (a:al) = a `mappend` (sumList al)
+
+getMulRowCol :: Ring a => [a] -> [a] -> a
+getMulRowCol r c = sumList (zipWith rmul r c)
+
+matmulGetRow' :: Ring a => Matrix a -> Matrix a -> Integer -> Integer -> [a]
+matmulGetRow' x y n (-1) = []
+matmulGetRow' x y n m    = (matmulGetRow' x y n (m - 1)) ++ ((getMulRowCol (getRow n x) (getColumn m y)):[])
+
+matmulGetRow :: Matrix a -> Matrix a -> Integer -> [a]
+matmulGetRow x (Matrix (y:ys)) n = matmulGetRow' x (Matrix (y:ys)) n ((lengthOfList y) - 1)
+
+matmul' :: Ring a => Matrix a -> Matrix a -> Integer -> [[a]]
+matmul' x y (-1) = []
+matmul' x y n    = (matmul' x y (n - 1)) ++ ((matmulGetRow x y n):[])
+
+matmul :: Matrix a -> Matrix a -> Matrix a
+matmul (Matrix x) y = Matrix (matmul' (Matrix x) y (lengthOfList x))
 
 -- (**) Реализуйте классы типов для векторных и скалярных полей.
 -- Перепишите в этих терминах что-нибудь из написанного выше.
 -- Реализуйте оператор дифференцирования, взятия градиента.
-class ? ScalarField ? where
-    ?
+--class ? ScalarField ? where
+--    ?
 
-class ? VectorField ? where
-    ?
+--class ? VectorField ? where
+--    ?
