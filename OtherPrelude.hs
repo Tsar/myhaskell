@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs, TypeSynonymInstances #-}
+
 module OtherPrelude where
 import Prelude( Show(..), Bool(..), Integer(..), Rational(..), Num(..), (+), (-), (*), (/), (<), (==), (>), (<=), (>=), not, (&&), error, ($), (.) )
 
@@ -220,7 +222,14 @@ class Monoid a => AMFoldable t a where
 -- Смотрите какой чит. Можно построить дерево только из элементов моноида.
 data MTree a = Monoid a => MLeaf | MNode a (MTree a) (MTree a)
 
--- Выпишите тип этого выражения. Фигурирует ли в нём Monoid? Почему?
+-- Выпишите тип этого выражения.
+-- Окай, выписал.
+-- Фигурирует ли в нём Monoid?
+-- Да.
+-- Почему?
+-- Предположительно, потому что если мы будем юзать MTree Type, у нас может
+-- не оказаться инстанса Monoid Type и это проблема.
+mtfold :: Monoid a => MTree a -> a
 mtfold MLeaf = mzero -- А то, что a - моноид нам будет даровано самой природой
 mtfold (MNode a l r) = a `mappend` (mtfold l) `mappend` (mtfold r)
 
@@ -265,6 +274,14 @@ class Monoid a => Group a where
 
 -- Определите
 --instance Group для Integer, Rational, MulRational
+instance Group Integer where
+    ginv = (0 -)
+
+instance Group Rational where
+    ginv = (0 -)
+
+instance Group MulRational where
+    ginv (RMult a) = RMult (1 / a)
 
 -- Группу и Абелеву группу в Хаскеле тоже не различить :(
 class Group a => Ring a where
@@ -273,6 +290,11 @@ class Group a => Ring a where
 
 -- Определите
 --instance Ring для Integer, Rational
+instance Ring Integer where
+    rmul = (*)
+
+instance Ring Rational where
+    rmul = (*)
 
 -- На самом деле коммутативное кольцо, но что поделать
 class Ring a => Field a where
