@@ -145,6 +145,14 @@ instance Monoid Integer where
     mappend = (+)
 
 data MulInteger = Mult Integer
+data MulRational = Mult Rational
+
+-- Реализуйте инстансы Monoid для Rational и MulRational
+instance Monoid Rational where
+    ?
+
+instance Monoid MulRational where
+    ?
 
 instange Monoid MulInteger where
     mzero = 1
@@ -184,19 +192,44 @@ instance MFoldable MTree where
 instance Monoid a => AMFoldable MTree a where
     amfold = mtfold
 
+--------- Тут переделаем немного
 -- Группа
-class Group a where
-    gzero :: a
-    ginv  :: a -> a
-    gmult :: a -> a -> a
+--class Group a where
+--    gzero :: a
+--    ginv  :: a -> a
+--    gmult :: a -> a -> a
+--
+--class Group Integer where
+--    gzero = 0
+--    ginv a = -a
+--    gmult = (+)
+--
+--class Group MulInteger where
+--    ? это я погорячился, да
 
-class Group Integer where
-    gzero = 0
-    ginv a = -a
-    gmult = (+)
+-- Хаскель слабоват для нормального определения всех этих штук.
+-- Кольцо вообще непонятно как определить, потому что группы и полугруппы
+-- должны быть по паре (тип, операция).
+class Monoid a => Group a where
+    ginv :: a -> a
 
-class Group MulInteger where
-    ?
+-- Определите
+--instance Group для Integer, Rational, MulRational
+
+-- Группу и Абелеву группу в Хаскеле тоже не различить :(
+class Group a => Ring a where
+    -- mappend из моноида это сложение
+    rmul :: a -> a -> a -- а это умножение
+
+-- Определите
+--instance Ring для Integer, Rational
+
+-- На самом деле коммутативное кольцо, но что поделать
+class Ring a => Field a where
+    rinv :: a -> a -> a
+
+-- Определите
+--instance Field для Rational
 
 -- Реализуйте тип для матриц (через списки) и операции над ними
 data Matrix a = ?
