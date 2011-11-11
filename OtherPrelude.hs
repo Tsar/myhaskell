@@ -302,12 +302,25 @@ class Ring a => Field a where
 
 -- Определите
 --instance Field для Rational
+instance Field Rational where
+    rinv = (1 /)
 
 -- Реализуйте тип для матриц (через списки) и операции над ними
-data Matrix a = ?
+data Matrix a = Ring a => Matrix [[a]]
 -- Чем должно быть a? Моноидом? Группой? Ещё чем-нибудь?
+-- Можно кольцом: "Определение. Матрица — математический объект, записываемый в виде прямоугольной таблицы элементов кольца или поля <...>"
 
-matsum = ?
+-- Вспомогательная функция (чтобы отображать матрицу вот в таком виде: [[1, 2], [3, 4]])
+getAsListOfLists :: Matrix a -> [[a]]
+getAsListOfLists (Matrix x) = x
+
+-- Разбивает список на списки заданного размера и возвращает список этих списков (вспомогательная функция)
+anticoncat :: Integer -> [a] -> [[a]]
+anticoncat n [] = []
+anticoncat n l  = (take n l):(anticoncat n (drop n l))
+
+matsum :: Matrix a -> Matrix a -> Matrix a
+matsum (Matrix x) (Matrix y) = Matrix (anticoncat (lengthOfList x) (zipWith mappend (concat x) (concat y)))
 
 matscalarmul = ?
 
