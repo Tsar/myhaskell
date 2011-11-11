@@ -133,22 +133,31 @@ scanr f z (a:as) = (foldr f z (a:as)):(scanr f z as)
 finiteTimeTest = take 10 $ foldr (:) [] $ repeat 1
 
 -- map f l = из первой лабораторной
+map :: (a -> b) -> [a] -> [b]
+map f []    = []
+map f (a:l) = (f a):(map f l)
 
 -- Склеивает список списков в список
 concat :: [[a]] -> [a]
-concat = ?
+concat []     = []
+concat (a:as) = a ++ concat as
 
 -- Эквивалент (concat . map), но эффективнее
 concatMap :: (a -> [b]) -> [a] -> [b]
-concatMap = ?
+concatMap f []     = []
+concatMap f (a:as) = (f a) ++ (concatMap f as)
 
 -- Сплющить два списка в список пар длинны min (length a, length b)
 zip :: [a] -> [b] -> [(a, b)]
-zip a b = ?
+zip [] b          = []
+zip a []          = []
+zip (a:as) (b:bs) = (a, b):(zip as bs)
 
 -- Аналогично, но плющить при помощи функции, а не конструктором (,)
 zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
-zipWith = ?
+zipWith f [] b          = []
+zipWith f a []          = []
+zipWith f (a:as) (b:bs) = (f a b):(zipWith f as bs)
 
 -- Интересные классы типов
 class Monoid a where
