@@ -121,12 +121,14 @@ scanl f z l  = (scanl f z (init l)) ++ ((foldl f z l):[])
 --            z
 --            
 foldr :: (a -> b -> b) -> b -> [a] -> b
-foldr f z l = ?
+foldr f z (a:[]) = f a z
+foldr f z (a:as) = f a (foldr f z as)
 
 -- Аналогично
 --  head (scanr f z xs) == foldr f z xs.
 scanr :: (a -> b -> b) -> b -> [a] -> [b]
-scanr = ?
+scanr f z []     = []
+scanr f z (a:as) = (foldr f z (a:as)):(scanr f z as)
 
 finiteTimeTest = take 10 $ foldr (:) [] $ repeat 1
 
