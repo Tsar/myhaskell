@@ -78,9 +78,29 @@ subsequences :: [a] -> [[a]]
 subsequences [] = [[]]
 subsequences (x:xs) = sub_xs ++ (appendElementToAllLists x sub_xs) where sub_xs = subsequences xs
 
+-- Вставка в список на определенную позицию (вспомогательная функция)
+insertIntoListAtPos :: a -> Integer -> [a] -> [a]
+insertIntoListAtPos a n l = (take n l) ++ (a:[]) ++ (drop n l)
+
+-- Вставка во все списки на определенную позицию (вспомогательная функция)
+insertIntoAllListsAtPos :: a -> Integer -> [[a]] -> [[a]]
+insertIntoAllListsAtPos a n []     = []
+insertIntoAllListsAtPos a n (l:ls) = (insertIntoListAtPos a n l):(insertIntoAllListsAtPos a n ls)
+
+-- Вставка во все списки на все позиции <= n (вспомогательная функция)
+insertIntoAllListsAtAllPoses :: a -> Integer -> [[a]] -> [[a]]
+insertIntoAllListsAtAllPoses a 0 l = insertIntoAllListsAtPos a 0 l
+insertIntoAllListsAtAllPoses a n l = (insertIntoAllListsAtPos a n l) ++ (insertIntoAllListsAtAllPoses a (n - 1) l)
+
+-- Длина списка (вспомогательная функция)
+lengthOfList :: [a] -> Integer
+lengthOfList []     = 0
+lengthOfList (a:as) = 1 + (lengthOfList as)
+
 -- (*) Все перестановки элементов данного списка
 permutations :: [a] -> [[a]]
-permutations = ?
+permutations [] = [[]]
+permutations (x:xs) = insertIntoAllListsAtAllPoses x (lengthOfList xs) (permutations xs)
 
 -- Повторяет элемент бесконечное число раз
 repeat :: a -> [a]
@@ -181,7 +201,7 @@ instance Monoid Rational where
     mappend = (+)
 
 instance Monoid MulRational where
-    mzero = RMutl 1
+    mzero = RMult 1
     (RMult a) `mappend` (RMult b) = RMult $ a * b
 
 instance Monoid MulInteger where
