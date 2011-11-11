@@ -1,5 +1,5 @@
 module OtherPrelude where
-import Prelude
+import Prelude( Show(..), Bool(..), Integer(..), Rational(..), Num(..), (+), (-), (*), (/), (<), (==), (>), (<=), (>=), not, (&&), error, ($), (.) )
 
 -- Склеить два списка за O(length a)
 (++) :: [a] -> [a] -> [a]
@@ -68,10 +68,15 @@ reverse :: [a] -> [a]
 reverse []     = []
 reverse (a:as) = (reverse as):a
 
+-- Добавить элемент ко всем спискам в списке (вспомогательная функция)
+appendElementToAllLists :: a -> [[a]] -> [[a]]
+appendElementToAllLists x []     = []
+appendElementToAllLists x (l:ls) = (x:l):(appendElementToAllLists x ls)
+
 -- (*) Все подсписки данного списка
 subsequences :: [a] -> [[a]]
 subsequences [] = [[]]
-subsequences (x:xs) = ?
+subsequences (x:xs) = sub_xs:(appendElementToAllLists x sub_xs) where sub_xs = subsequences xs
 
 -- (*) Все перестановки элементов данного списка
 permutations :: [a] -> [[a]]
