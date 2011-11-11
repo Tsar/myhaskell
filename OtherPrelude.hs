@@ -3,31 +3,36 @@ import Prelude
 
 -- Склеить два списка за O(length a)
 (++) :: [a] -> [a] -> [a]
-a ++ b = ?
+[] ++ b     = b
+(a:as) ++ b = a:(as ++ b)
 
 -- Список без первого элемента
 tail :: [a] -> [a]
-tail = ?
+tail (a:as) = as
 
 -- Список без последнего элемента
 init :: [a] -> [a]
-init = ?
+init (a:[]) = []
+init (a:as) = a:(init as)
 
 -- Первый элемент
 head :: [a] -> a
-head = ?
+head (a:as) = a
 
 -- Последний элемент
 last :: [a] -> a
-last = ?
+last (a:[]) = a
+last (a:as) = last as
 
 -- n первых элементов списка
 take :: Integer -> [a] -> [a]
-take = ?
+take 0 a      = []
+take n (a:as) = a:(take (n - 1) as)
 
 -- Список без n первых элементов
 drop :: Integer -> [a] -> [a]
-drop = ?
+drop 0 a      = a
+drop n (a:as) = drop (n - 1) as
 
 -- Копировать из списка в результат до первого нарушения предиката
 -- takeWhile (< 3) [1,2,3,4,1,2,3,4] == [1,2]
