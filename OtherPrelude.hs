@@ -59,12 +59,14 @@ break p (a:as) = if (p a) then ((a:subgood), subbad) else (subgood, (a:subbad)) 
 
 -- n-ый элемент списка (считая с нуля)
 (!!) :: [a] -> Integer -> a
-[] !! n = error "!!: empty list"
-l  !! n = ?
+[]     !! n = error "!!: empty list"
+(a:as) !! 0 = a
+(a:as) !! n = as !! (n - 1)
 
 -- Список задом на перёд
 reverse :: [a] -> [a]
-reverse = ?
+reverse []     = []
+reverse (a:as) = (reverse as):a
 
 -- (*) Все подсписки данного списка
 subsequences :: [a] -> [[a]]
@@ -77,7 +79,7 @@ permutations = ?
 
 -- Повторяет элемент бесконечное число раз
 repeat :: a -> [a]
-repeat = ?
+repeat a = a:(repeat a)
 
 
 -- Левая свёртка
