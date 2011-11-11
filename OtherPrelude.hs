@@ -99,12 +99,14 @@ repeat a = a:(repeat a)
 --  / \
 -- z  l!!0
 foldl :: (a -> b -> a) -> a -> [b] -> a
-foldl f z l = ?
+foldl f z (a:[]) = f z a
+foldl f z l      = f (foldl f z (init l)) (last l)
 
 -- Тот же foldl, но в списке оказываются все промежуточные результаты
 -- last (scanl f z xs) == foldl f z xs
 scanl :: (a -> b -> a) -> a -> [b] -> [a]
-scanl = ?
+scanl f z [] = []
+scanl f z l  = (scanl f z (init l)) ++ ((foldl f z l):[])
 
 -- Правая свёртка
 -- порождает такое дерево вычислений:
