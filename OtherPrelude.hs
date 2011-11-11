@@ -37,22 +37,25 @@ drop n (a:as) = drop (n - 1) as
 -- Копировать из списка в результат до первого нарушения предиката
 -- takeWhile (< 3) [1,2,3,4,1,2,3,4] == [1,2]
 takeWhile :: (a -> Bool) -> [a] -> [a]
-takeWhile = ?
+takeWhile p []     = []
+takeWhile p (a:as) = if (p a) then a:(takeWhile p as) else []
 
 -- Не копировать из списка в результат до первого нарушения предиката,
 -- после чего скопировать все элементы, включая первый нарушивший
 -- dropWhile (< 3) [1,2,3,4,1,2,3,4] == [3,4,1,2,3,4]
 dropWhile :: (a -> Bool) -> [a] -> [a]
-dropWhile = ?
+dropWhile p []     = []
+dropWhile p (a:as) = if (p a) then (dropWhile p as) else (a:as)
 
--- Разбить список в пару (найбольший префикс удовлетворяющий p, всё остальное)
+-- Разбить список в пару (наибольший префикс удовлетворяющий p, всё остальное)
 span :: (a -> Bool) -> [a] -> ([a], [a])
-span p = ?
+span p a = ((takeWhile p a), (dropWhile p a))
 
 -- Разбить список по предикату на (takeWhile p xs, dropWhile p xs),
 -- но эффективнее
 break :: (a -> Bool) -> [a] -> ([a], [a])
-break = ?
+break p []     = ([], [])
+break p (a:as) = if (p a) then ((a:subgood), subbad) else (subgood, (a:subbad)) where (subgood, subbad) = break p as
 
 -- n-ый элемент списка (считая с нуля)
 (!!) :: [a] -> Integer -> a
