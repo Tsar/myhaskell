@@ -226,7 +226,7 @@ class Group a => Ring a where
 
 -- На самом деле коммутативное кольцо, но что поделать
 class Ring a => Field a where
-    rinv :: a -> a -> a
+    rinv :: a -> a
 
 -- Определите
 --instance Field для Rational
