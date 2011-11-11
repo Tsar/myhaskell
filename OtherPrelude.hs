@@ -350,7 +350,7 @@ matmul' x y (-1) = []
 matmul' x y n    = (matmul' x y (n - 1)) ++ ((matmulGetRow x y n):[])
 
 matmul :: Matrix a -> Matrix a -> Matrix a
-matmul (Matrix x) y = Matrix (matmul' (Matrix x) y (lengthOfList x))
+matmul (Matrix x) y = Matrix (matmul' (Matrix x) y ((lengthOfList x) - 1))
 
 -- (**) Реализуйте классы типов для векторных и скалярных полей.
 -- Перепишите в этих терминах что-нибудь из написанного выше.
