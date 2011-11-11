@@ -55,7 +55,7 @@ span p a = ((takeWhile p a), (dropWhile p a))
 -- но эффективнее
 break :: (a -> Bool) -> [a] -> ([a], [a])
 break p []     = ([], [])
-break p (a:as) = if (p a) then ((a:subgood), subbad) else (subgood, (a:subbad)) where (subgood, subbad) = break p as
+break p (a:as) = if (p a) then ((a:subgood), subbad) else ([], a:as) where (subgood, subbad) = break p as
 
 -- n-ый элемент списка (считая с нуля)
 (!!) :: [a] -> Integer -> a
@@ -66,7 +66,7 @@ break p (a:as) = if (p a) then ((a:subgood), subbad) else (subgood, (a:subbad)) 
 -- Список задом на перёд
 reverse :: [a] -> [a]
 reverse []     = []
-reverse (a:as) = (reverse as):a
+reverse (a:as) = (reverse as):a  -- TODO: Сделать чтоб компилилось
 
 -- Добавить элемент ко всем спискам в списке (вспомогательная функция)
 appendElementToAllLists :: a -> [[a]] -> [[a]]
@@ -76,7 +76,7 @@ appendElementToAllLists x (l:ls) = (x:l):(appendElementToAllLists x ls)
 -- (*) Все подсписки данного списка
 subsequences :: [a] -> [[a]]
 subsequences [] = [[]]
-subsequences (x:xs) = sub_xs:(appendElementToAllLists x sub_xs) where sub_xs = subsequences xs
+subsequences (x:xs) = sub_xs ++ (appendElementToAllLists x sub_xs) where sub_xs = subsequences xs
 
 -- (*) Все перестановки элементов данного списка
 permutations :: [a] -> [[a]]
