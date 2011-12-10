@@ -34,12 +34,12 @@ class Applicative f where
     pure :: a -> f a
     (<*>) :: f (a -> b) -> f a -> f b
 
---{- -- This is a nice pattern to comment out/uncomment something.
-instance Applicative f => Functor f where -- This means
-    fmap = (<*>) . pure                   -- I can deduce `Functor f` if
-                                          -- given `Applicative f`.
----}
---------------------------------------
+--    --{- -- This is a nice pattern to comment out/uncomment something.
+--    instance Applicative f => Functor f where -- This means
+--        fmap = (<*>) . pure                   -- I can deduce `Functor f` if
+--                                              -- given `Applicative f`.
+--    ---}
+--    --------------------------------------
 
 class Category cat where
     id :: cat a a
@@ -59,7 +59,7 @@ class Monad1 m where
     return1 :: a -> m a
     (>>=) :: m a -> (a -> m b) -> m b
 
---(>>) :: ?
+(>>) :: Monad1 m => m a -> m b -> m b
 a >> b = a >>= (\_ -> b)
 
 class Functor m => Monad2 m where -- This means `fmap` is avaible
@@ -85,24 +85,24 @@ instance Monad1 m => Monad2 m where
     join mma = mma >>= id
 
 instance Monad1 m => Functor m where
-    fmap f ma = undefined
+    fmap f ma = ma >>= (return1 . f)
 
 instance Monad1 m => Applicative m where
     pure = return1
 
-    f <*> ma = undefined
+    f <*> ma = f >>= (\x -> (ma >>= (\y -> return1 (x y))))
 
-instance Monad2 m => Monad1 m where
-    return1 = return2
-
-    a >>= f = undefined
+--    instance Monad2 m => Monad1 m where
+--        return1 = return2
+--
+--        a >>= f = join (fmap f a)
 
 instance Monad3 m => Monad1 m where
     return1 = return3
 
-    ma >>= f = undefined
+    ma >>= f = (id >=> f) ma
 
 instance Monad1 m => Monad3 m where
     return3 = return1
 
-    f >=> g = undefined
+    f >=> g = \a -> (f a) >>= g
