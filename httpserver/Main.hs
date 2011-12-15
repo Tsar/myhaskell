@@ -13,5 +13,5 @@ main = withSocketsDo $ do
         forkIO $ do
             hSetBuffering handle LineBuffering
             msg <- hGetLine handle
-            putStrLn $ "The client says: " ++ msg
+            hPutStr handle msg
             hClose handle
