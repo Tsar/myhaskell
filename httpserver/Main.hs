@@ -4,8 +4,21 @@ import Network (listenOn, accept, Socket, withSocketsDo, PortID(..))
 import Control.Concurrent
 import Control.Monad
 
-makeResponseForRequest :: String -> String
-makeResponseForRequest request = if (take 5 request) == "GET /" then "HTTP/1.1 200 OK\r\n\r\ntrololo" else "HTTP/1.1 404 Not Found\r\n\r\n"
+fuckMe = do
+    putStrLn "fuck me"
+
+makeResponseForRequest :: String -> IO String
+makeResponseForRequest request = do
+    if (take 5 request) == "GET /"
+        then do
+            fileName <- return ((drop 5 (take ((length request) - 10) request)))
+            fileHandle <- catch (openFile fileName ReadMode) (\_ -> do
+                fuckMe
+                openFile fileName ReadMode)
+            fileContents <- hGetContents fileHandle
+            hClose fileHandle
+            return ("HTTP/1.1 200 OK\r\n\r\n" ++ fileContents)
+        else return "HTTP/1.1 400 Bad Request\r\n\r\n"
 
 main :: IO ()
 main = withSocketsDo $ do
@@ -19,6 +32,6 @@ main = withSocketsDo $ do
             request <- hGetLine handle
             putStrLn request   --DEBUG CODE
             hSetBuffering handle NoBuffering
-            hPutStr handle (makeResponseForRequest request)
-            putStrLn (makeResponseForRequest request)  --DEBUG CODE
+            (makeResponseForRequest request) >>= (hPutStr handle)
+            (makeResponseForRequest request) >>= putStrLn  --DEBUG CODE
             hClose handle
