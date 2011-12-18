@@ -3,22 +3,22 @@ import System.Environment (getArgs)
 import Network (listenOn, accept, Socket, withSocketsDo, PortID(..))
 import Control.Concurrent
 import Control.Monad
-
-fuckMe = do
-    putStrLn "fuck me"
+import Directory (doesFileExist)
 
 makeResponseForRequest :: String -> IO String
 makeResponseForRequest request = do
     if (take 5 request) == "GET /"
         then do
             fileName <- return ((drop 5 (take ((length request) - 10) request)))
-            fileHandle <- catch (openFile fileName ReadMode) (\_ -> do
-                fuckMe
-                openFile fileName ReadMode)
-            fileContents <- hGetContents fileHandle
-            hClose fileHandle
-            return ("HTTP/1.1 200 OK\r\n\r\n" ++ fileContents)
-        else return "HTTP/1.1 400 Bad Request\r\n\r\n"
+            fileExists <- doesFileExist fileName
+            if fileExists
+                then do
+                    fileHandle <- openFile fileName ReadMode
+                    fileContents <- hGetContents fileHandle
+                    --hClose fileHandle
+                    return ("HTTP/1.1 200 OK\r\nContent-Length: " ++ (show (length fileContents)) ++ "\r\n\r\n" ++ fileContents)
+                else return "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n404: Not Found"
+        else return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\n400: Bad Request"
 
 main :: IO ()
 main = withSocketsDo $ do
