@@ -4,12 +4,7 @@ import Text.Parsec.String
 import Lambda
 
 word :: Parser String
-word = do{ c <- letter
-         ; do{ cs <- word
-             ; return (c:cs)
-             }
-           <|> return [c]
-         }
+word = many1 letter
 
 termParser :: Parser Term
 termParser = do{ char '\\'
