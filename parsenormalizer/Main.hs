@@ -23,9 +23,9 @@ applicationList t ts = foldl (\t' t'' -> App t' t'') t ts
 abstractionList vs t = foldr (\v' t' -> Abs v' t') t vs
 
 lambdaParser :: Parser Term
-lambdaParser = do{ reservedOp "\\"
-                 ; vs <- many1 identifier
-                 ; (reservedOp ".") <|> (reservedOp "->")
+lambdaParser = do{ m_reservedOp "\\"
+                 ; vs <- many1 m_identifier
+                 ; (m_reservedOp ".") <|> (m_reservedOp "->")
                  ; t <- termParser
                  ; return (abstractionList vs t)
                  }
@@ -36,14 +36,14 @@ lambdaParser = do{ reservedOp "\\"
                  }
 
 notLambdaParser :: Parser Term
-notLambdaParser = do{ v <- identifier
+notLambdaParser = do{ v <- m_identifier
                     ; return (Var v)
                     }
                  <|>
-                  parens lambdaParser
+                  m_parens lambdaParser
 
 termParser :: Parser Term
 termParser = lambdaParser
 
---main = parseTest termParser "\\f . (\\x . f (x x)) (\\x . f (x x))"
+main = parseTest termParser "\\f . (\\x . f (x x)) (\\x . f (x x))"
 --main = parseTest termParser "x x"
