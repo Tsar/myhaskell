@@ -68,4 +68,4 @@ main = do
     fileContents <- readFile (head args)
     case parse termParser "" fileContents of
         Left error -> print error
-        Right t    -> putStrLn (termToString t)
+        Right t    -> putStrLn (termToString (normal' t))
