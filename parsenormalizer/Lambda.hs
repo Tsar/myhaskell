@@ -138,7 +138,6 @@ u = Abs "a" $ Abs "b" $ App (Var "a") $ App (Var "b") (Var "_b")
 v = Abs "a" $ Abs "b" $ App (App (Var "a") (Var "b")) (Var "_b")
 w = Abs "a" $ Abs "b" $ Abs "c" $ Abs "d" $ App (App (Var "a") (Var "b")) (App (Var "c") (Var "d"))
 
-{--
 main = test 100
     [ ("no", normal)
     , ("ap", applicative) ]
@@ -159,7 +158,6 @@ main = test 100
     , (w `App` Abs "a" (Var "b")) `App` loop
     , loop
     ]
---}
 
 -- Если вы не понимаете как это работает, то пока и не надо
 pall n term  = mapM_ (\(desc, reduce) -> putStr (desc ++ ": ") >> print (reduce n term))
