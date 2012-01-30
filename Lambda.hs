@@ -50,11 +50,19 @@ betaRecuct var what term = case term of
 
 -- Нормализация нормальным порядком терма term
 normal' :: Term -> Term
-normal' term = case term of
+{--normal' term = case term of
     Var v            -> term
     App (Abs v t) t' -> normal' (betaRecuct v t' t)
     Abs v t          -> Abs v (normal' t)
-    App t t'         -> App (normal' t) (normal' t')
+    App t t'         -> App (normal' t) (normal' t')--}
+
+normal' term = case term of
+    Var v    -> term
+    App t t' -> let normalOfT = normal' t in
+                    case normalOfT of
+                         Abs v t'' -> normal' (betaReduct v t' t'')
+                         _         -> App normalOfT (normal' t')
+    Abs v t  -> Abs v (normal' t)
 
 -- Нормализация аппликативным порядком терма term
 applicative' :: Term -> Term
